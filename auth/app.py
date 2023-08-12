@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
 from models import db
+from resources import UserAPI, AuthAPI
 
 
 def create_app(config_filename: str):
@@ -11,9 +12,14 @@ def create_app(config_filename: str):
     app.config.from_object(config_filename)
 
     db.init_app(app)
+    from models import User, Role
+    models = (User, Role)
 
     api = Api()
     api.resources.clear()
+    api.add_resource(UserAPI, "/api/user")
+    api.add_resource(AuthAPI, "/api/auth")
+
     api.init_app(app) # noqa
 
     migrate = Migrate()
@@ -24,5 +30,11 @@ def create_app(config_filename: str):
 
     with app.app_context():
         db.create_all()
-
+        for role in ('admin', 'developer', 'manager'):
+            db.session.add(Role(name=role))
     return app
+
+
+if __name__ == "__main__":
+    app = create_app('config.Config')
+    app.run(debug=True, host='0.0.0.0')
