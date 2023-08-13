@@ -1,8 +1,8 @@
 import uuid
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
-from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 

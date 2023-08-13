@@ -4,17 +4,13 @@ services:
   redis:
     container_name: redis
     image: redis
+    environment:
+      REDIS_PORT: 6379
 
   auth:
     container_name: auth
     build:
       context: ./auth
     environment:
-      - REDIS_HOST=redis
-
-  tracker:
-    container_name: tracker
-    build:
-      context: ./tracker
-    environment:
-      - REDIS_HOST=redis
+      REDIS_HOST: redis
+      REDIS_PORT:  6379

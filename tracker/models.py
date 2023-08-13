@@ -1,22 +1,22 @@
-import uuid
 import enum
+import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Enum
-from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
 
 
-class UserRoles(enum.Enum):
+class UserRoles(str, enum.Enum):
     ADMIN = 'admin'
     DEVELOPER = 'developer'
     MANAGER = 'manager'
 
 
-class TaskStatus(enum.Enum):
+class TaskStatus(str, enum.Enum):
     DONE = 'done'
-    PROGRESS = 'progress'
+    PROGRESS = 'in_progress'
 
 
 class BaseModel(db.Model):

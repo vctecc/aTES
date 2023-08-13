@@ -1,10 +1,9 @@
 from flask import Flask
-from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from flask_restful import Api
-
-from models import db, User, Role
-from resources import UserAPI, AuthAPI
+from models import Role, User, db
+from resources import AuthAPI, UserAPI
 
 
 def create_app(config_filename: str):
@@ -31,6 +30,7 @@ def create_app(config_filename: str):
         db.create_all()
         for role in ('admin', 'developer', 'manager'):
             db.session.add(Role(name=role))
+        db.session.commit()
     return app
 
 

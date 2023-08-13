@@ -1,10 +1,9 @@
 from flask import Flask
-from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from flask_restful import Api
-
-from models import db, Task, User
-from resources import CreateTask, GetTask, ReassignTask
+from models import Task, User, db
+from resources import CreateTask, GetTask, GetUser, ReassignTask
 
 
 def create_app(config_filename: str):
@@ -16,6 +15,7 @@ def create_app(config_filename: str):
 
     api = Api()
     api.resources.clear()
+    api.add_resource(GetUser, "/api/user/<user_id>")
     api.add_resource(GetTask, "/api/task/<task_id>")
     api.add_resource(CreateTask, "/api/task")
     api.add_resource(ReassignTask, "/api/reassign")
@@ -30,9 +30,6 @@ def create_app(config_filename: str):
 
     with app.app_context():
         db.create_all()
-        user = User(username='FirstPopug', email='fist_popug@popug.io')
-        db.session.add(user)
-        db.session.commit()
     return app
 
 

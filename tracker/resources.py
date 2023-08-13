@@ -1,12 +1,13 @@
 from http import HTTPStatus
+
 from flask import jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import (create_access_token, get_jwt_identity,
+                                jwt_required)
 from flask_restful import Resource
 from marshmallow import ValidationError
-from schemas import TaskSchema
+from models import Task, TaskStatus, User, UserRoles, db
+from schemas import TaskSchema, UserSchema
 from sqlalchemy.sql.expression import func
-
-from models import db, User, Task, UserRoles, TaskStatus
 
 
 def get_random_user() -> User | None:
@@ -42,8 +43,8 @@ class GetTask(Resource):
 
     @jwt_required()
     def get(self, task_id: str):
-        task_id = db.get_or_404(Task, task_id)
-        return jsonify(task_id), HTTPStatus.OK
+        task = db.get_or_404(Task, task_id)
+        return jsonify(task), HTTPStatus.OK
 
 
 class ReassignTask(Resource):
@@ -57,3 +58,11 @@ class ReassignTask(Resource):
                 db.session.commit()
 
         return HTTPStatus.OK
+
+
+class GetUser(Resource):
+
+    @jwt_required()
+    def get(self, user_id: str):
+        user = db.get_or_404(User, user_id)
+        return jsonify(UserSchema().dump(user))

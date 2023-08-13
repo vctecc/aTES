@@ -1,12 +1,15 @@
+import json
 from http import HTTPStatus
+
 from flask import jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import (create_access_token, get_jwt_identity,
+                                jwt_required)
 from flask_restful import Resource
 from marshmallow import ValidationError
-from schemas import UserSchema, CreateUserSchema, LoginSchema
+from models import Role, User, db
+from schemas import CreateUserSchema, LoginSchema, UserSchema
 from sqlalchemy.exc import IntegrityError
-
-from models import db, User, Role
+from streams import user_stream
 
 
 class UserAPI(Resource):
@@ -15,7 +18,7 @@ class UserAPI(Resource):
     def get(self):
         identity = get_jwt_identity()
         user = db.get_or_404(User, identity)
-        return jsonify(user)
+        return jsonify(UserSchema().dump(user))
 
     @jwt_required()
     def patch(self):
@@ -53,6 +56,18 @@ class UserAPI(Resource):
             user.role = db.session.query(Role).filter_by(name=role).first()
             db.session.add(user)
             db.session.commit()
+
+            msg = {
+                'operation': 'created',
+                'data': {
+                    'id': user.id,
+                    'role': user.role.name,
+                    'username': user.username,
+                    'email': user.email
+                }
+            }
+            user_stream.save({'msg': json.dumps(msg)})
+
         except IntegrityError:
             return f"{data['username']} already exists", HTTPStatus.CONFLICT
 

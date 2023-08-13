@@ -1,5 +1,5 @@
-from marshmallow import fields, Schema
 from flask_marshmallow import Marshmallow
+from marshmallow import Schema, fields
 from models import User
 
 ma = Marshmallow()
