@@ -1,7 +1,6 @@
 from http import HTTPStatus
 from flask import jsonify, request
-from flask_jwt_extended import (create_access_token, get_jwt_identity,
-                                jwt_required)
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_restful import Resource
 from marshmallow import ValidationError
 from schemas import UserSchema, CreateUserSchema, LoginSchema
@@ -38,7 +37,7 @@ class UserAPI(Resource):
                 setattr(user, key, value)
         db.session.commit()
 
-        return HTTPStatus.OK
+        return jsonify(schema.dump(user))
 
     def post(self):
         req = request.get_json(force=True)

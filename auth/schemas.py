@@ -29,12 +29,13 @@ class CreateUserSchema(Schema):
 
 
 class UserSchema(BaseSchema):
-    class Meta:
-        model = User
-        ordered = True
 
     id = fields.UUID(dump_only=True)
     username = fields.String(required=True)
     email = fields.Email(required=True)
-    hashed_password = fields.String(required=True, data_key="password", load_only=True)
+    password = fields.String(required=True, load_only=True)
     role = fields.String(dump_only=True)
+
+    class Meta:
+        model = User
+        ordered = True

@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from models import db
+from models import db, User, Role
 from resources import UserAPI, AuthAPI
 
 
@@ -12,7 +12,6 @@ def create_app(config_filename: str):
     app.config.from_object(config_filename)
 
     db.init_app(app)
-    from models import User, Role
     models = (User, Role)
 
     api = Api()
@@ -37,4 +36,4 @@ def create_app(config_filename: str):
 
 if __name__ == "__main__":
     app = create_app('config.Config')
-    app.run(debug=True, host='0.0.0.0')
+    app.run()

@@ -1,0 +1,20 @@
+version: "3"
+services:
+
+  redis:
+    container_name: redis
+    image: redis
+
+  auth:
+    container_name: auth
+    build:
+      context: ./auth
+    environment:
+      - REDIS_HOST=redis
+
+  tracker:
+    container_name: tracker
+    build:
+      context: ./tracker
+    environment:
+      - REDIS_HOST=redis
