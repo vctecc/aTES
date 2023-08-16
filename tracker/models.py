@@ -2,7 +2,7 @@ import enum
 import uuid
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, String, Integer
 from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
@@ -22,7 +22,7 @@ class TaskStatus(str, enum.Enum):
 class BaseModel(db.Model):
     __abstract__ = True
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Integer, primary_key=True)
     created = db.Column(DateTime, default=db.func.current_timestamp())
     modified = db.Column(DateTime, default=db.func.current_timestamp(),
                          onupdate=db.func.current_timestamp())
@@ -31,6 +31,7 @@ class BaseModel(db.Model):
 class User(BaseModel):
     __tablename__ = "users"
 
+    public_id = Column(String(36), nullable=False, unique=True)
     email = Column(String(255), nullable=False, unique=True)
     username = Column(String(255), nullable=False, unique=True)
     role = Column(Enum(UserRoles), default=UserRoles.DEVELOPER)
@@ -43,7 +44,8 @@ class User(BaseModel):
 class Task(BaseModel):
     __tablename__ = "tasks"
 
-    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    public_id = Column(String(36), nullable=False, unique=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.public_id"), nullable=False)
     user = relationship("User", back_populates="tasks")
     description = Column(String(255), nullable=False)
     status = Column(Enum(TaskStatus), default=TaskStatus.PROGRESS)

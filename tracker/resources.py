@@ -24,13 +24,15 @@ class CreateTask(Resource):
         try:
             data = schema.load(req)
         except ValidationError as err:
+            print(err.normalized_messages())
             return f"{err.normalized_messages()}", HTTPStatus.BAD_REQUEST
 
         user = get_random_user()
         if not user:
+            print("No users available")
             return "No users available", HTTPStatus.BAD_REQUEST
 
-        task = Task(description=data['description'], user_id=user.id)
+        task = Task(description=data['description'], user_id=user.public_id)
         db.session.add(task)
         db.session.commit()
 
@@ -43,8 +45,8 @@ class GetTask(Resource):
 
     @jwt_required()
     def get(self, task_id: str):
-        task = db.get_or_404(Task, task_id)
-        return jsonify(task), HTTPStatus.OK
+        if task := db.session.query(Task).filter_by(public_id=task_id).first():
+            return jsonify(task), HTTPStatus.OK
 
 
 class ReassignTask(Resource):
@@ -64,5 +66,6 @@ class GetUser(Resource):
 
     @jwt_required()
     def get(self, user_id: str):
-        user = db.get_or_404(User, user_id)
-        return jsonify(UserSchema().dump(user))
+        if user := db.session.query(User).filter_by(public_id=user_id).first():
+            return jsonify(UserSchema().dump(user))
+        return HTTPStatus.NOT_FOUND

@@ -30,6 +30,9 @@ def create_app(config_filename: str):
 
     with app.app_context():
         db.create_all()
+
+    # broker_reader = Thread(target=processing, args=[app, user_stream], daemon=True)
+    # broker_reader.run()
     return app
 
 

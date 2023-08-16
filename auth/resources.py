@@ -17,8 +17,9 @@ class UserAPI(Resource):
     @jwt_required()
     def get(self):
         identity = get_jwt_identity()
-        user = db.get_or_404(User, identity)
-        return jsonify(UserSchema().dump(user))
+        if user := db.session.query(User).filter_by(public_id=identity).first():
+            return jsonify(UserSchema().dump(user))
+        return HTTPStatus.NOT_FOUND
 
     @jwt_required()
     def patch(self):
@@ -38,6 +39,7 @@ class UserAPI(Resource):
                 user.role = role
             else:
                 setattr(user, key, value)
+        # TODO sed message to broker
         db.session.commit()
 
         return jsonify(schema.dump(user))
@@ -57,10 +59,11 @@ class UserAPI(Resource):
             db.session.add(user)
             db.session.commit()
 
+            # TODO use special functional for that
             msg = {
                 'operation': 'created',
                 'data': {
-                    'id': user.id,
+                    'public_id': user.public_id,
                     'role': user.role.name,
                     'username': user.username,
                     'email': user.email
@@ -71,7 +74,7 @@ class UserAPI(Resource):
         except IntegrityError:
             return f"{data['username']} already exists", HTTPStatus.CONFLICT
 
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=user.public_id)
         return jsonify(accessToken=access_token)
 
 
@@ -93,5 +96,5 @@ class AuthAPI(Resource):
         if not user:
             return "User not found", HTTPStatus.NOT_FOUND
 
-        access_token = create_access_token(user.id)
+        access_token = create_access_token(user.public_id)
         return jsonify(accessToken=access_token)

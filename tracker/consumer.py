@@ -1,17 +1,19 @@
 import json
 import time
 
-from app import create_app
 from flask import Flask
+from app import create_app
 from models import User, db
 from streams import RedisStream, user_stream
 
 
 def database_loader(app: Flask, msg: dict):
+    # TODO refactor it
     with app.app_context():
         operation = msg['operation']
         data = msg['data']
         if operation == 'created':
+            print(data)
             user = User(**data)
             db.session.add(user)
         elif operation == 'updated':

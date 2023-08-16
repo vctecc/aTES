@@ -7,6 +7,7 @@ class Config:
     HOST = '0.0.0.0'
     PORT = 5001
     SQLALCHEMY_DATABASE_URI = "sqlite:///tracker.db"
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
     REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
     REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))

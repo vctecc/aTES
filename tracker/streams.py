@@ -27,5 +27,5 @@ class RedisStream:
         return []
 
 
-user_stream = RedisStream(host=Config.REDIS_HOST, port=Config.REDIS_PORT, stream='UserCUD')
-task_stream = RedisStream(host=Config.REDIS_HOST, port=Config.REDIS_PORT, stream='TaskCUD')
+user_stream = RedisStream(host=Config.REDIS_HOST, port=Config.REDIS_PORT, stream='user-stream')
+task_stream = RedisStream(host=Config.REDIS_HOST, port=Config.REDIS_PORT, stream='life-cycle')

@@ -7,7 +7,7 @@ ma = Marshmallow()
 
 class TaskSchema(Schema):
 
-    id = fields.UUID(dump_only=True)
+    public_id = fields.UUID(dump_only=True)
     status = fields.Method("get_status", dump_only=True)
     user_id = fields.String(dump_only=True)
     description = fields.String(required=True)
@@ -21,7 +21,7 @@ class TaskSchema(Schema):
 
 
 class UserSchema(ma.SQLAlchemySchema):
-    id = fields.UUID(dump_only=True)
+    public_id = fields.UUID(dump_only=True)
     username = fields.String(required=True)
     email = fields.Email(required=True)
     role = fields.String(dump_only=True)
