@@ -2,7 +2,7 @@ import enum
 import uuid
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, String, Integer
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()

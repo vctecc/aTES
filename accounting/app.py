@@ -36,4 +36,4 @@ def create_app(config_filename: str):
 
 if __name__ == "__main__":
     app = create_app('config.Config')
-    app.run(port=5002)
+    app.run(port=app.config['PORT'])

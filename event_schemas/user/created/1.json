@@ -1,0 +1,84 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "UserSchema": {
+            "properties": {
+                "email": {
+                    "title": "email",
+                    "type": "string"
+                },
+                "password": {
+                    "title": "password",
+                    "type": "string"
+                },
+                "publicId": {
+                    "title": "public_id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "role": {
+                    "title": "role",
+                    "type": "string"
+                },
+                "username": {
+                    "title": "username",
+                    "type": "string"
+                }
+            },
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "publicId",
+                "role",
+                "username"
+            ],
+            "additionalProperties": false
+        },
+        "BaseMeta": {
+            "properties": {
+                "id": {
+                    "title": "id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "name": {
+                    "title": "name",
+                    "type": "string"
+                },
+                "time": {
+                    "title": "time",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "version": {
+                    "title": "version",
+                    "type": "integer"
+                }
+            },
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "time",
+                "version"
+            ],
+            "additionalProperties": false
+        },
+        "CreateUser": {
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "$ref": "#/definitions/UserSchema"
+                },
+                "meta": {
+                    "type": "object",
+                    "$ref": "#/definitions/BaseMeta"
+                }
+            },
+            "type": "object",
+            "additionalProperties": false
+        }
+    },
+    "$ref": "#/definitions/CreateUser"
+}

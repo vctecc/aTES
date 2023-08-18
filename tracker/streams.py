@@ -1,4 +1,6 @@
+import json
 import time
+from typing import Any
 
 import redis
 from config import Config
@@ -12,8 +14,8 @@ class RedisStream:
         self.stream = stream
         self.timestamp = round(time.time() * 1000)
 
-    def save(self, value: dict):
-        return self._con.xadd(self.stream, value)
+    def send(self, data: Any):
+        return self._con.xadd(self.stream, {'msg': json.dumps(data)})
 
     def xread(self):
         if res := self._con.xread({self.stream: '$'}, block=10, count=None):

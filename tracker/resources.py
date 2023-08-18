@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+from events import assign_task_event, create_task_event
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
@@ -7,6 +8,7 @@ from marshmallow import ValidationError
 from models import Task, TaskStatus, User, UserRoles, db
 from schemas import TaskSchema, UserSchema
 from sqlalchemy.sql.expression import func
+from streams import task_stream
 
 
 def get_random_user() -> User | None:
@@ -35,6 +37,8 @@ class CreateTask(Resource):
         db.session.add(task)
         db.session.commit()
 
+        task_stream.send(create_task_event(task))
+
         resp = jsonify(schema.dump(task))
         resp.status_code = HTTPStatus.CREATED
         return resp
@@ -57,6 +61,7 @@ class ReassignTask(Resource):
             if user := get_random_user():
                 task.user = user
                 db.session.commit()
+                task_stream.send(assign_task_event(task))
 
         return HTTPStatus.OK
 
