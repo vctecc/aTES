@@ -26,4 +26,4 @@ class RedisStream:
         return []
 
 
-user_stream = RedisStream(host=Config.REDIS_HOST, port=Config.REDIS_PORT, stream='UserCUD')
+user_stream = RedisStream(host=Config.REDIS_HOST, port=Config.REDIS_PORT, stream='user-stream')

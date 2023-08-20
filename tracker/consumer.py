@@ -3,30 +3,42 @@ import time
 
 from app import create_app
 from flask import Flask
+from loguru import logger
 from models import User, db
 from streams import RedisStream, user_stream
+from config import Config
+from schema_registry import SchemaRegistry, ValidationError
+
+schema_registry = SchemaRegistry(Config)
 
 
-def database_loader(app: Flask, msg: dict):
+def database_loader(app: Flask, msg_data: dict) -> None:
     with app.app_context():
-        operation = msg['operation']
-        data = msg['data']
-        if operation == 'created':
+        try:
+            schema_registry.validate(msg_data, 'user.created', 1)
+        except ValidationError:
+            logger.error('Unsupported streaming data')
+            # TODO save in DataBase
+            return None
+
+        operation = msg_data['meta']['name']
+        data = msg_data['data']
+        if operation == 'user.created':
             user = User(**data)
             db.session.add(user)
-        elif operation == 'updated':
+        elif operation == 'user.updated':
             user = db.session.query(User).get(['id'])
             for key, value in data.items():
                 setattr(user, key, value)
 
         db.session.commit()
+        return None
 
 
 def stream_producer(stream: RedisStream):
     while True:
         if data := stream.read():
             for msg in data:
-                print(msg)
                 yield json.loads(msg[1]['msg'])
         else:
             time.sleep(1)

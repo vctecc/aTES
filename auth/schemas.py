@@ -30,7 +30,7 @@ class CreateUserSchema(Schema):
 
 class UserSchema(BaseSchema):
 
-    id = fields.UUID(dump_only=True)
+    public_id = fields.UUID(dump_only=True)
     username = fields.String(required=True)
     email = fields.Email(required=True)
     password = fields.String(required=True, load_only=True)

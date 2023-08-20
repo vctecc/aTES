@@ -1,7 +1,7 @@
 import uuid
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, DateTime, ForeignKey, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
@@ -10,7 +10,7 @@ db = SQLAlchemy()
 class BaseModel(db.Model):
     __abstract__ = True
 
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Integer, primary_key=True)
     created = db.Column(DateTime, default=db.func.current_timestamp())
     modified = db.Column(DateTime, default=db.func.current_timestamp(),
                          onupdate=db.func.current_timestamp())
@@ -33,6 +33,7 @@ class User(BaseModel):
 
     __tablename__ = "users"
 
+    public_id = Column(String(36), nullable=False, unique=True, default=lambda: str(uuid.uuid4()))
     email = Column(String(255), nullable=False, unique=True)
     username = Column(String(255), nullable=False, unique=True)
     password = Column(String(255))

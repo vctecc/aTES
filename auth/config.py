@@ -15,3 +15,5 @@ class Config:
     SECRET_KEY = "SECRET_KEY"
     JWT_SECRET_KEY = "JWT_SECRET_KEY"
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
+
+    SCHEMA_REGISTRY = os.getenv("SCHEMA_REGISTRY")

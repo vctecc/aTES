@@ -2,23 +2,26 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_restful import Api
-from models import Role, User, db
-from resources import AuthAPI, UserAPI
+from models import Task, User, db
+from resources import UserView, AccountView, AccountListView, StatisticsView
 
 
 def create_app(config_filename: str):
-    app = Flask("auth")
+    app = Flask("accounting")
     app.config.from_object(config_filename)
 
     db.init_app(app)
-    models = (User, Role)
+    models = (User, Task)
 
     api = Api()
     api.resources.clear()
-    api.add_resource(UserAPI, "/api/user")
-    api.add_resource(AuthAPI, "/api/auth")
+    api.add_resource(UserView, "/api/users/<user_id>")
+    api.add_resource(AccountListView, "/api/accounts")
+    api.add_resource(AccountView, "/api/accounts/<account_id>")
+    api.add_resource(StatisticsView, "/api/statistics")
 
-    api.init_app(app) # noqa
+
+    api.init_app(app)  # noqa
 
     migrate = Migrate()
     migrate.init_app(app, db)
@@ -28,12 +31,10 @@ def create_app(config_filename: str):
 
     with app.app_context():
         db.create_all()
-        for role in ('admin', 'developer', 'manager'):
-            db.session.add(Role(name=role))
-        db.session.commit()
+
     return app
 
 
 if __name__ == "__main__":
     app = create_app('config.Config')
-    app.run(app.run(port=app.config['PORT']))
+    app.run(port=app.config['PORT'])

@@ -3,7 +3,7 @@ import uuid
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import mapped_column, relationship
 
 db = SQLAlchemy()
 
@@ -28,27 +28,38 @@ class BaseModel(db.Model):
                          onupdate=db.func.current_timestamp())
 
 
+class Task(BaseModel):
+    __tablename__ = "task"
+
+    public_id = Column(String(36), nullable=False, unique=True, default=lambda: str(uuid.uuid4()))
+    status = Column(Enum(TaskStatus), default=TaskStatus.PROGRESS)
+    price_one = Column(Integer, default=0)
+    price_two = Column(Integer, default=0)
+
+    def __repr__(self):
+        return f"<Task status:{self.status}, assigned to {self.user.username}>"
+
+
 class User(BaseModel):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
     public_id = Column(String(36), nullable=False, unique=True)
     email = Column(String(255), nullable=False, unique=True)
     username = Column(String(255), nullable=False, unique=True)
     role = Column(Enum(UserRoles), default=UserRoles.DEVELOPER)
-    tasks = relationship("Task", back_populates='user')
+    account = relationship(back_populates="account", uselist=False)
 
     def __repr__(self):
         return f"<User username:{self.username}, email:{self.email}>"
 
 
-class Task(BaseModel):
-    __tablename__ = "tasks"
+class Account(BaseModel):
+    __tablename__ = "account"
 
-    public_id = Column(String(36), nullable=False, unique=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(String(36), ForeignKey("users.public_id"), nullable=False)
-    user = relationship("User", back_populates="tasks")
-    description = Column(String(255), nullable=False)
-    status = Column(Enum(TaskStatus), default=TaskStatus.PROGRESS)
+    public_id = Column(String(36), nullable=False, unique=True)
+    balance = Column(Integer, default=0)
+    user_id = mapped_column(ForeignKey("user.public_id"))
+    user = relationship("User", back_populates="account")
 
     def __repr__(self):
-        return f"<Task status:{self.status}, assigned to {self.user.username}>"
+        return f"<Account for {self.user.username}. Balance: {self.balance}>"

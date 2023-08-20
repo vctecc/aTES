@@ -9,10 +9,20 @@ AUTH_API = 'http://localhost:5000/api'
 TRACKER_API = 'http://localhost:5001/api'
 session = Session()
 
+POPUG = {
+    "username": f"Popug_{random.randint(1, 1000)}",
+    "password": "12345",
+    "email": f"popug_{random.randint(1, 1000)}@popug.io",
+    'role': 'developer',
+}
+
 
 def get_headers(data: dict = None):
     if not data:
-        data = {"username": "Popug", "password": "12345"}
+        data = {
+            "username": POPUG["username"],
+            "password": POPUG["password"]
+        }
     r = session.post(f"{AUTH_API}/auth", json=data)
     access_token = r.json()["accessToken"]
     return {'Authorization': f'Bearer {access_token}'}
@@ -20,22 +30,15 @@ def get_headers(data: dict = None):
 
 @pytest.mark.auth
 def test_create_popug():
-    data = {
-        "username": "Popug",
-        "password": "12345",
-        "email": "popug@popug.io",
-        'role': 'developer',
-    }
-
-    r = session.post(f"{AUTH_API}/user", json=data)
+    r = session.post(f"{AUTH_API}/user", json=POPUG)
     assert r.status_code == HTTPStatus.OK
 
 
 @pytest.mark.auth
 def test_login_popug():
     data = {
-        "username": "Popug",
-        "password": "12345",
+        "username": POPUG["username"],
+        "password": POPUG["password"]
     }
     r = session.post(f"{AUTH_API}/auth", json=data)
     assert r.status_code == HTTPStatus.OK
@@ -46,7 +49,7 @@ def test_stream_user():
     data = {
         "username": f"Popug_{random.randint(1, 1000)}",
         "password": "12345",
-        "email": f"popug@popug.io_{random.randint(1, 1000)}",
+        "email": f"popug_{random.randint(1, 1000)}@popug.io",
         'role': 'developer',
     }
 
@@ -59,7 +62,8 @@ def test_stream_user():
     assert r.status_code == HTTPStatus.OK
 
     time.sleep(1)
-    user_id = r.json()['id']
+    user_id = r.json().get('publicId')
+    print(r.json())
     r = session.get(f"{TRACKER_API}/user/{user_id}", headers=headers)
     assert r.status_code == HTTPStatus.OK
     print(r.json())
