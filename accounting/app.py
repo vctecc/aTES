@@ -3,7 +3,7 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_restful import Api
 from models import Task, User, db
-from resources import CreateTask, GetTask, GetUser, ReassignTask
+from resources import UserView, AccountView, AccountListView, StatisticsView
 
 
 def create_app(config_filename: str):
@@ -15,9 +15,10 @@ def create_app(config_filename: str):
 
     api = Api()
     api.resources.clear()
-    api.add_resource(GetUser, "/api/users/<user_id>")
-    api.add_resource(GetUser, "/api/accounts")
-    api.add_resource(GetUser, "/api/accounts/<account_id>")
+    api.add_resource(UserView, "/api/users/<user_id>")
+    api.add_resource(AccountListView, "/api/accounts")
+    api.add_resource(AccountView, "/api/accounts/<account_id>")
+    api.add_resource(StatisticsView, "/api/statistics")
 
 
     api.init_app(app)  # noqa
